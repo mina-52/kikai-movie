@@ -21,7 +21,9 @@ FONT = "/usr/share/fonts/opentype/ipafont-gothic/ipagp.ttf"
 
 MEDIA = os.path.abspath(sys.argv[1])
 OUT = os.path.abspath(sys.argv[2])
-SEG = os.path.join(OUT, "segments_v2")
+# NOTEXT=1 で文字なしのベース映像を作る（Remotion で文字や光の演出を重ねる用）
+NOTEXT = bool(os.environ.get("NOTEXT"))
+SEG = os.path.join(OUT, "segments_v2_clean" if NOTEXT else "segments_v2")
 os.makedirs(SEG, exist_ok=True)
 
 D1 = "drive1"
@@ -317,7 +319,7 @@ def render(i, s):
             pre = (f"{TONEMAP},vidstabtransform=input={trf}:smoothing=20:zoom=4:"
                    f"optzoom=0:interpol=bicubic,")
         v = f"[0:v]{pre}fps={FPS},format=yuv420p," + fit(w, h, s, dur)
-    tf = text_filters(s["text"], dur)
+    tf = [] if NOTEXT else text_filters(s["text"], dur)
     v += ("," + ",".join(tf) if tf else "") + f",trim=0:{dur},setpts=PTS-STARTPTS,setsar=1[v]"
     fc = [v]
 
@@ -376,7 +378,7 @@ def main():
     fc.append(f"[mus][amb]amix=inputs=2:normalize=0:duration=first,"
               f"loudnorm=I=-14:TP=-1.5:LRA=11,afade=t=out:st={total-3:.3f}:d=3,"
               f"aresample=48000[aout]")
-    final = os.path.join(OUT, "kikai_v2.mp4")
+    final = os.path.join(OUT, "kikai_v2_clean.mp4" if NOTEXT else "kikai_v2.mp4")
     args += ["-filter_complex", ";".join(fc), "-map", "[vout]", "-map", "[aout]",
              "-c:v", "libx264", "-preset", "slow", "-crf", "19", "-pix_fmt", "yuv420p",
              "-movflags", "+faststart", "-c:a", "aac", "-b:a", "256k", final]
