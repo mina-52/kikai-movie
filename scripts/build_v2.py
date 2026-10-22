@@ -185,7 +185,8 @@ mark(255.0)
 clip("sunset_horizon", 2, 10, ("sunset_horizon", 2, WAVE_MID), cy=0.5, xf=1.5)
 mark(264.0)
 black(13, ("waves_rock", 36, WAVE_MID),
-      text=[("関西学院大学　山田ゼミ作成", "credit1"), ("音声提供　○○", "credit2")], xf=0)
+      text=[("関西学院大学　山田ゼミ作成", "credit1"), ("音声提供　サンゴの命～喜界島～", "credit2"),
+            ("制作　土岐宏大", "credit3")], xf=0)
 
 
 # ---------------------------------------------------------------------------
@@ -272,9 +273,9 @@ def text_filters(texts, dur):
             fs.append(f"drawbox=x=80:y=ih-170:w=6:h=70:color=white@0.9:t=fill:{en}")
             fs.append(f"drawtext=fontfile={FONT}:text='{t}':fontsize=52:fontcolor=white:"
                       f"shadowcolor=black@0.7:shadowx=2:shadowy=2:x=106:y=h-162:alpha='{a}'")
-        elif style in ("credit1", "credit2"):
-            y = "h/2-80" if style == "credit1" else "h/2+30"
-            t0 = 0.8 if style == "credit1" else 1.8
+        elif style in ("credit1", "credit2", "credit3"):
+            y = {"credit1": "h/2-130", "credit2": "h/2-10", "credit3": "h/2+80"}[style]
+            t0 = {"credit1": 0.8, "credit2": 1.8, "credit3": 2.3}[style]
             a = f"if(lt(t,{t0}),0,if(lt(t,{t0+1}),t-{t0},if(lt(t,{dur-2}),1,max(0,({dur}-t)/2))))"
             fs.append(f"drawtext=fontfile={FONT}:text='{t}':fontsize=60:fontcolor=white:"
                       f"x=(w-tw)/2:y={y}:alpha='{a}'")
